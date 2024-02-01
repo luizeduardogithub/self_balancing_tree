@@ -1,0 +1,157 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definição da estrutura do nó da árvore AVL
+struct node {
+    int val;            // valor
+    struct node* left;  // filho à esquerda
+    struct node* right; // filho à direita
+    int ht;             // altura do nó
+};
+
+// Função para obter o máximo de dois inteiros
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+// Função para obter a altura de um nó (retorna -1 para nó nulo)
+int height(struct node* n) {
+    if (n == NULL) {
+        return -1;
+    }
+    return n->ht;
+}
+
+// Função para obter o fator de equilíbrio de um nó
+int getBalance(struct node* n) {
+    if (n == NULL) {
+        return 0;
+    }
+    return height(n->left) - height(n->right);
+}
+
+// Função para criar um novo nó com um determinado valor
+struct node* newNode(int val) {
+    struct node* node = (struct node*)malloc(sizeof(struct node));
+    node->val = val;
+    node->left = NULL;
+    node->right = NULL;
+    node->ht = 0;
+    return node;
+}
+
+// Função de rotação à direita
+struct node* rightRotate(struct node* y) {
+    struct node* x = y->left;
+    struct node* T2 = x->right;
+
+    // Realiza a rotação
+    x->right = y;
+    y->left = T2;
+
+    // Atualiza as alturas
+    y->ht = max(height(y->left), height(y->right)) + 1;
+    x->ht = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+// Função de rotação à esquerda
+struct node* leftRotate(struct node* x) {
+    struct node* y = x->right;
+    struct node* T2 = y->left;
+
+    // Realiza a rotação
+    y->left = x;
+    x->right = T2;
+
+    // Atualiza as alturas
+    x->ht = max(height(x->left), height(x->right)) + 1;
+    y->ht = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+// Função de inserção na árvore AVL
+struct node* insert(struct node* root, int new_val) {
+    // Realiza a inserção padrão de BST
+    if (root == NULL) {
+        return newNode(new_val);
+    }
+
+    if (new_val < root->val) {
+        root->left = insert(root->left, new_val);
+    } else if (new_val > root->val) {
+        root->right = insert(root->right, new_val);
+    } else {
+        // Duplicatas não são permitidas
+        return root;
+    }
+
+    // Atualiza a altura do nó atual
+    root->ht = 1 + max(height(root->left), height(root->right));
+
+    // Obtém o fator de equilíbrio
+    int balance = getBalance(root);
+
+    // Caso Esquerdo-Esquerdo
+    if (balance > 1 && new_val < root->left->val) {
+        return rightRotate(root);
+    }
+
+    // Caso Direito-Direito
+    if (balance < -1 && new_val > root->right->val) {
+        return leftRotate(root);
+    }
+
+    // Caso Esquerdo-Direito
+    if (balance > 1 && new_val > root->left->val) {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    // Caso Direito-Esquerdo
+    if (balance < -1 && new_val < root->right->val) {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
+    // Nenhuma rotação necessária
+    return root;
+}
+
+// Função para percorrer a árvore em pré-ordem e imprimir os valores
+void preOrder(struct node* root) {
+    if (root != NULL) {
+        printf("%d ", root->val);
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+}
+
+// Função principal
+int main() {
+    struct node* root = NULL;
+    int new_val;
+
+    // Leitura dos valores até encontrar um valor negativo
+    while (1) {
+        printf("Digite um valor (ou um valor negativo para encerrar): ");
+        scanf("%d", &new_val);
+
+        // Verifica se o usuário deseja encerrar
+        if (new_val < 0) {
+            break;
+        }
+
+        // Insere o valor na árvore AVL
+        root = insert(root, new_val);
+
+        // Imprime a travessia pré-ordem da árvore após cada inserção
+        printf("Preorder traversal da árvore AVL: ");
+        preOrder(root);
+        printf("\n");
+    }
+
+    return 0;
+}

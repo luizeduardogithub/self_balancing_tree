@@ -11,17 +11,17 @@ Certifique-se de ter um compilador C instalado em seu sistema, como o GCC.
     Abra um terminal e navegue até o diretório contendo o código-fonte (arquivo .c). Use o seguinte comando para compilar:
 
     ```bash
-    gcc -o avl_tree avl_tree.c
-    ```
+    gcc arvore_avl.c main.c -o arvore_avl
 
-    Isso criará um executável chamado `avl_tree`.
+    ```
 
 2. **Execução:**
 
     Execute o programa usando o seguinte comando:
 
     ```bash
-    ./avl_tree
+    ./arvore_avl
+
     ```
 
     O programa solicitará que você insira valores inteiros até que um valor negativo seja inserido, encerrando assim a entrada.
